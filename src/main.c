@@ -24,6 +24,8 @@ void hue_changed(GtkAdjustment *adjustment, gpointer data);
 
 void sat_changed(GtkAdjustment *adjustment, gpointer data);
 
+void size_changed(GtkAdjustment *adjustment, gpointer data);
+
 void apply_theme(GtkButton *button, gpointer data);
 
 void restart_fluxbox();
@@ -56,27 +58,31 @@ int main(int argc, char *argv[])
   surf.cr = cairo_create(surf.surf);
   surf.image = gtk_image_new_from_surface(surf.surf);
 
-  GtkAdjustment *hue_adjustment = gtk_adjustment_new(0, 0, 360, 1, 0, 0);
+  GtkAdjustment *hue_adjustment = gtk_adjustment_new(theme.hue, 0, 360, 1, 0, 0);
   g_signal_connect(hue_adjustment, "value-changed", G_CALLBACK(hue_changed),
                    &surf);
   GtkWidget *hue_label = gtk_label_new("Hue");
   GtkWidget *hue_scale = gtk_scale_new(GTK_ORIENTATION_HORIZONTAL,
                                        hue_adjustment);
-  gtk_range_set_value(GTK_RANGE(hue_scale), theme.hue);
   gtk_scale_add_mark(GTK_SCALE(hue_scale), 60, GTK_POS_TOP, NULL);
   gtk_scale_add_mark(GTK_SCALE(hue_scale), 120, GTK_POS_TOP, NULL);
   gtk_scale_add_mark(GTK_SCALE(hue_scale), 180, GTK_POS_TOP, NULL);
   gtk_scale_add_mark(GTK_SCALE(hue_scale), 240, GTK_POS_TOP, NULL);
   gtk_scale_add_mark(GTK_SCALE(hue_scale), 300, GTK_POS_TOP, NULL);
 
-  GtkAdjustment *sat_adjustment = gtk_adjustment_new(0, 0, 100, 1, 0, 0);
+  GtkAdjustment *sat_adjustment = gtk_adjustment_new(theme.saturation, 0, 100, 1, 0, 0);
   g_signal_connect(sat_adjustment, "value-changed", G_CALLBACK(sat_changed),
                    &surf);
   GtkWidget *sat_label = gtk_label_new("Saturation");
   GtkWidget *sat_scale = gtk_scale_new(GTK_ORIENTATION_HORIZONTAL,
                                        sat_adjustment);
-  gtk_range_set_value(GTK_RANGE(sat_scale), theme.saturation);
   gtk_widget_set_hexpand(sat_scale, true);
+
+  GtkAdjustment *spin_adjustment = gtk_adjustment_new(theme.size, 1, 100, 1, 0, 0);
+  g_signal_connect(spin_adjustment, "value-changed", G_CALLBACK(size_changed),
+                   &surf);
+  GtkWidget *spin_label = gtk_label_new("Size");
+  GtkWidget *spin_button = gtk_spin_button_new(spin_adjustment, 1, 0);
 
   GtkWidget *apply_btn = gtk_button_new_with_label("Apply");
   g_signal_connect(apply_btn, "clicked", G_CALLBACK(apply_theme), &theme);
@@ -92,11 +98,13 @@ int main(int argc, char *argv[])
   gtk_grid_attach(GTK_GRID(grid), hue_scale, 1, 1, 1, 1);
   gtk_grid_attach(GTK_GRID(grid), sat_label, 0, 2, 1, 1);
   gtk_grid_attach(GTK_GRID(grid), sat_scale, 1, 2, 1, 1);
+  gtk_grid_attach(GTK_GRID(grid), spin_label, 0, 3, 1, 1);
+  gtk_grid_attach(GTK_GRID(grid), spin_button, 1, 3, 1, 1);
 
   GtkWidget *button_box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 4);
   gtk_box_pack_end(GTK_BOX(button_box), apply_btn, false, false, 0);
   gtk_box_pack_end(GTK_BOX(button_box), cancel_btn, false, false, 0);
-  gtk_grid_attach(GTK_GRID(grid), button_box, 0, 3, 2, 1);
+  gtk_grid_attach(GTK_GRID(grid), button_box, 0, 4, 2, 1);
 
   gtk_container_add(GTK_CONTAINER(window), grid);
   gtk_container_set_border_width(GTK_CONTAINER(window), 8);
@@ -130,6 +138,12 @@ void sat_changed(GtkAdjustment *adjustment, gpointer data)
   struct surface *surf = (struct surface*)data;
   surf->theme->saturation = gtk_adjustment_get_value(adjustment);
   update_color(surf);
+}
+
+void size_changed(GtkAdjustment *adjustment, gpointer data)
+{
+  struct surface *surf = (struct surface*)data;
+  surf->theme->size = gtk_adjustment_get_value(adjustment);
 }
 
 void apply_theme(GtkButton *button, gpointer data)

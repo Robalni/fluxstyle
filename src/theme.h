@@ -4,6 +4,7 @@
 typedef struct theme {
   float hue;
   float saturation;
+  int size;
   char *file_name;
 } Theme;
 

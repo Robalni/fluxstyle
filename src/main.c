@@ -58,7 +58,8 @@ int main(int argc, char *argv[])
   surf.cr = cairo_create(surf.surf);
   surf.image = gtk_image_new_from_surface(surf.surf);
 
-  GtkAdjustment *hue_adjustment = gtk_adjustment_new(theme.hue, 0, 360, 1, 0, 0);
+  GtkAdjustment *hue_adjustment = gtk_adjustment_new(theme.hue, 0, 360, 1,
+                                                     0, 0);
   g_signal_connect(hue_adjustment, "value-changed", G_CALLBACK(hue_changed),
                    &surf);
   GtkWidget *hue_label = gtk_label_new("Hue");
@@ -70,7 +71,8 @@ int main(int argc, char *argv[])
   gtk_scale_add_mark(GTK_SCALE(hue_scale), 240, GTK_POS_TOP, NULL);
   gtk_scale_add_mark(GTK_SCALE(hue_scale), 300, GTK_POS_TOP, NULL);
 
-  GtkAdjustment *sat_adjustment = gtk_adjustment_new(theme.saturation, 0, 100, 1, 0, 0);
+  GtkAdjustment *sat_adjustment = gtk_adjustment_new(theme.saturation, 0, 100,
+                                                     1, 0, 0);
   g_signal_connect(sat_adjustment, "value-changed", G_CALLBACK(sat_changed),
                    &surf);
   GtkWidget *sat_label = gtk_label_new("Saturation");
@@ -78,7 +80,8 @@ int main(int argc, char *argv[])
                                        sat_adjustment);
   gtk_widget_set_hexpand(sat_scale, true);
 
-  GtkAdjustment *spin_adjustment = gtk_adjustment_new(theme.size, 1, 100, 1, 0, 0);
+  GtkAdjustment *spin_adjustment = gtk_adjustment_new(theme.size, 1, 100, 1,
+                                                      0, 0);
   g_signal_connect(spin_adjustment, "value-changed", G_CALLBACK(size_changed),
                    &surf);
   GtkWidget *spin_label = gtk_label_new("Size");

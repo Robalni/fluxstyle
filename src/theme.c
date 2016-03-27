@@ -217,7 +217,7 @@ static int read_until(FILE *f, char **str, const char *chars)
       if (ch == chars[i] || ch == EOF) {
         ungetc(ch, f);
         (*str)[read_chars] = '\0';
-        return *str;
+        return read_chars;
       }
       i++;
     }

@@ -44,7 +44,7 @@ void apply_theme(GtkButton *button, gpointer data);
 
 void restart_fluxbox();
 
-bool file_contains(const char *fname, const unsigned char *str);
+bool file_contains(const char *fname, const char *str);
 
 int main(int argc, char *argv[])
 {
@@ -108,8 +108,8 @@ int main(int argc, char *argv[])
   g_signal_connect(cancel_btn, "clicked", G_CALLBACK(gtk_main_quit), NULL);
 
   GtkWidget *grid = gtk_grid_new();
-  gtk_grid_set_row_spacing(grid, 4);
-  gtk_grid_set_column_spacing(grid, 4);
+  gtk_grid_set_row_spacing(GTK_GRID(grid), 4);
+  gtk_grid_set_column_spacing(GTK_GRID(grid), 4);
   gtk_grid_attach(GTK_GRID(grid), surf.image, 0, 0, 2, 1);
   gtk_grid_attach(GTK_GRID(grid), hue_label, 0, 1, 1, 1);
   gtk_grid_attach(GTK_GRID(grid), hue_scale, 1, 1, 1, 1);
@@ -203,7 +203,7 @@ void restart_fluxbox()
   }
 }
 
-bool file_contains(const char *fname, const unsigned char *str)
+bool file_contains(const char *fname, const char *str)
 {
   int i;
   FILE *f = fopen(fname, "r");
@@ -214,7 +214,7 @@ bool file_contains(const char *fname, const unsigned char *str)
   /* Compare every character in str with the file. */
   for (i = 0; str[i] != 0; i++) {
     ch = fgetc(f);
-    if (ch != (const int)str[i]) {
+    if (ch != (const int)(const unsigned char)str[i]) {
       fclose(f);
       return false;
     }

@@ -56,7 +56,6 @@ bool load_theme(Theme *theme, const char *fname)
     }
   }
 
-  int ch;
   bool is_comment;
   char *key;
   char *value;

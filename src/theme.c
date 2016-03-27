@@ -14,7 +14,6 @@
 */
 
 #include "color.h"
-#include "theme_file.h"
 #include "theme.h"
 
 #include <stdlib.h>

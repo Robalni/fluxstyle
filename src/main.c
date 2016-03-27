@@ -15,7 +15,6 @@
 
 #include "color.h"
 #include "theme.h"
-#include "theme_file.h"
 
 #include <stdlib.h>
 #include <sys/types.h>

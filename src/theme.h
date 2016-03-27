@@ -16,11 +16,19 @@
 #ifndef THEME_H
 #define THEME_H
 
+#include <stdbool.h>
+
 typedef struct theme {
   float hue;
   float saturation;
   int size;
   char *file_name;
 } Theme;
+
+void destroy_theme(Theme *theme);
+
+bool load_theme(struct theme *theme, const char *fname);
+
+void write_theme_file(struct theme *theme, const char *fname);
 
 #endif  /* THEME_H */

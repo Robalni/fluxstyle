@@ -17,12 +17,15 @@
 #define THEME_H
 
 #include <stdbool.h>
+#include <gtk/gtk.h>
 
 typedef struct theme {
   float hue;
   float saturation;
   int size;
+  char *extra_lines;
   char *file_name;
+  GtkTextBuffer *gtk_buffer;
 } Theme;
 
 void destroy_theme(Theme *theme);

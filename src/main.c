@@ -118,12 +118,38 @@ int main(int argc, char *argv[])
   gtk_grid_attach(GTK_GRID(grid), spin_label, 0, 3, 1, 1);
   gtk_grid_attach(GTK_GRID(grid), spin_button, 1, 3, 1, 1);
 
+  GtkWidget *text_view = gtk_text_view_new();
+  GtkTextBuffer *text_buffer
+    = gtk_text_view_get_buffer(GTK_TEXT_VIEW(text_view));
+  if (theme.extra_lines) {
+    gtk_text_buffer_set_text(text_buffer, theme.extra_lines, -1);
+  }
+  theme.gtk_buffer = text_buffer;
+  GtkWidget *text_label
+    = gtk_label_new("You can add your own style rules here.");
+  gtk_widget_set_halign(text_label, GTK_ALIGN_START);
+  GtkWidget *adv_box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 4);
+  gtk_box_pack_start(GTK_BOX(adv_box), text_label, false, false, 0);
+  gtk_box_pack_start(GTK_BOX(adv_box), text_view, true, true, 0);
+
+  GtkWidget *stack = gtk_stack_new();
+  gtk_stack_add_titled(GTK_STACK(stack), grid, "basic", "Basic");
+  gtk_stack_add_titled(GTK_STACK(stack), adv_box, "adv", "Advanced");
+  GtkWidget *stack_switcher = gtk_stack_switcher_new();
+  gtk_stack_switcher_set_stack(GTK_STACK_SWITCHER(stack_switcher),
+                               GTK_STACK(stack));
+  gtk_widget_set_halign(stack_switcher, GTK_ALIGN_CENTER);
+
   GtkWidget *button_box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 4);
   gtk_box_pack_end(GTK_BOX(button_box), apply_btn, false, false, 0);
   gtk_box_pack_end(GTK_BOX(button_box), cancel_btn, false, false, 0);
-  gtk_grid_attach(GTK_GRID(grid), button_box, 0, 4, 2, 1);
 
-  gtk_container_add(GTK_CONTAINER(window), grid);
+  GtkWidget *main_box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 4);
+  gtk_box_pack_start(GTK_BOX(main_box), stack_switcher, false, false, 0);
+  gtk_box_pack_start(GTK_BOX(main_box), stack, true, true, 0);
+  gtk_box_pack_end(GTK_BOX(main_box), button_box, false, false, 0);
+
+  gtk_container_add(GTK_CONTAINER(window), main_box);
   gtk_container_set_border_width(GTK_CONTAINER(window), 8);
 
   gtk_widget_show_all(window);
@@ -166,8 +192,19 @@ void size_changed(GtkAdjustment *adjustment, gpointer data)
 void apply_theme(GtkButton *button, gpointer data)
 {
   Theme *theme = (Theme*)data;
+
+  GtkTextIter start_iter;
+  GtkTextIter end_iter;
+  gtk_text_buffer_get_start_iter(theme->gtk_buffer, &start_iter);
+  gtk_text_buffer_get_end_iter(theme->gtk_buffer, &end_iter);
+  theme->extra_lines = gtk_text_buffer_get_text(theme->gtk_buffer,
+                                                &start_iter, &end_iter, false);
+
   write_theme_file(theme, theme->file_name);
   restart_fluxbox();
+  if (theme->file_name[0] == '-' && theme->file_name[1] == '\0') {
+    gtk_main_quit();
+  }
 }
 
 void restart_fluxbox()

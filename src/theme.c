@@ -27,9 +27,12 @@ static int skip_chars(FILE *f, const char *chars);
 
 static int read_until(FILE *f, char **str, const char *chars);
 
+static long file_to_str(FILE *f, char **str);
+
 void destroy_theme(Theme *theme)
 {
   free(theme->file_name);
+  free(theme->extra_lines);
 }
 
 bool load_theme(Theme *theme, const char *fname)
@@ -56,19 +59,18 @@ bool load_theme(Theme *theme, const char *fname)
     }
   }
 
-  bool is_comment;
   char *key;
   char *value;
-  do {
-    skip_chars(f, " \t");
-    is_comment = (fgetc(f) == '#');
+  while (!feof(f)) {
     skip_chars(f, "# \t");
-    read_until(f, &key, ": \t");
+    read_until(f, &key, ": \t\r\n");
     skip_chars(f, ": \t");
     read_until(f, &value, "\r\n");
     skip_chars(f, "\r\n");
 
-    if (key && value) {
+    if (key && strcmp(key, "extra-rules") == 0) {
+        file_to_str(f, &theme->extra_lines);
+    } else if (key && value) {
       if (strcmp(key, "hue") == 0) {
         theme->hue = atof(value);
       } else if (strcmp(key, "saturation") == 0) {
@@ -80,11 +82,9 @@ bool load_theme(Theme *theme, const char *fname)
 
     free(key);
     free(value);
-  } while (is_comment);
-
-  if (!(fname[0] == '-' && fname[1] == 0)) {
-    fclose(f);
   }
+
+  fclose(f);
 
   return true;
 }
@@ -164,9 +164,12 @@ void write_theme_file(Theme *theme, const char *fname)
   hsl_to_hex(color, theme->hue, theme->saturation, 70);
   fprintf(f, "menu.hilite.color: %s\n", color);
 
-  if (!(fname[0] == '-' && fname[1] == 0)) {
-    fclose(f);
+  if (theme->extra_lines && theme->extra_lines[0] != 0) {
+    fputs("# extra-rules\n", f);
+    fputs(theme->extra_lines, f);
   }
+
+  fclose(f);
 }
 
 /********************/
@@ -224,4 +227,18 @@ static int read_until(FILE *f, char **str, const char *chars)
     read_chars++;
   }
   return read_chars;
+}
+
+static long file_to_str(FILE *f, char **str)
+{
+  long fpos = ftell(f);
+  fseek(f, 0, SEEK_END);
+  long fend = ftell(f);
+  fseek(f, fpos, SEEK_SET);
+  long fsize = fend - fpos;
+
+  *str = malloc(fsize + 1);
+  fread(*str, fsize, 1, f);
+  (*str)[fsize] = 0;
+  return fsize;
 }

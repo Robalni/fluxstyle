@@ -125,12 +125,14 @@ int main(int argc, char *argv[])
     gtk_text_buffer_set_text(text_buffer, theme.extra_lines, -1);
   }
   theme.gtk_buffer = text_buffer;
+  GtkWidget *scroll = gtk_scrolled_window_new(NULL, NULL);
+  gtk_container_add(GTK_CONTAINER(scroll), text_view);
   GtkWidget *text_label
     = gtk_label_new("You can add your own style rules here.");
   gtk_widget_set_halign(text_label, GTK_ALIGN_START);
   GtkWidget *adv_box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 4);
   gtk_box_pack_start(GTK_BOX(adv_box), text_label, false, false, 0);
-  gtk_box_pack_start(GTK_BOX(adv_box), text_view, true, true, 0);
+  gtk_box_pack_start(GTK_BOX(adv_box), scroll, true, true, 0);
 
   GtkWidget *stack = gtk_stack_new();
   gtk_stack_add_titled(GTK_STACK(stack), grid, "basic", "Basic");

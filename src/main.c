@@ -228,7 +228,7 @@ void restart_fluxbox()
       if (file_contains(full_path, "fluxbox")) {
         fluxbox_pid = atoi(proc_ent->d_name);
         if (fluxbox_pid > 0) {
-          if (kill(fluxbox_pid, SIGUSR1) == 0) {
+          if (kill(fluxbox_pid, SIGHUP) == 0) {
             fluxbox_was_killed = true;
           }
           break;

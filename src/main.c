@@ -55,6 +55,8 @@ int main(int argc, char *argv[])
   if (argc == 2) {
     theme_file = argv[1];
   } else {
+    fputs("Using stdin/stdout to read/write theme file. "
+          "Start the program with an argument to specify a file.\n", stderr);
     theme_file = "-";
   }
 
